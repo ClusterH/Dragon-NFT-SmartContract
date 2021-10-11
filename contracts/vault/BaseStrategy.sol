@@ -35,7 +35,7 @@ abstract contract BaseStrategy is Ownable, ReentrancyGuard, Pausable {
     uint256 public constant feeMaxTotal = 1000;
     uint256 public constant feeMax = 10000; // 100 = 1%
 
-    uint256 public withdrawFeeFactor = 10000; // 0% withdraw fee
+    uint256 public withdrawFeeFactor = 9000; // 10% withdraw fee, origin: 0% withdraw fee -> withdrawFeeFactor = 10000;
     uint256 public constant withdrawFeeFactorMax = 10000;
     uint256 public constant withdrawFeeFactorLL = 9900;
 
@@ -96,7 +96,6 @@ abstract contract BaseStrategy is Ownable, ReentrancyGuard, Pausable {
     function _farm() internal returns (uint256) {
         uint256 wantAmt = IERC20(wantAddress).balanceOf(address(this));
         if (wantAmt == 0) return 0;
-
         uint256 sharesBefore = vaultSharesTotal();
         _vaultDeposit(wantAmt);
         uint256 sharesAfter = vaultSharesTotal();

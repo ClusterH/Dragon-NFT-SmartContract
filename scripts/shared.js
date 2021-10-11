@@ -49,6 +49,7 @@ const QUICK_SWAP = {
 };
 
 const WETH = "0x0d500B1d8E8eF31E21C99d1Db9A6444d3ADf1270"; // on polygon
+// const WETH = "0xc778417e063141139fce010982780140aa0cd5ab "; // on rinkeby
 
 const UniswapV2Router = require("./abis/UniswapV2Router.json");
 const UniswapV2Factory = require("./abis/UniswapV2Factory.json");
@@ -112,11 +113,51 @@ async function createPair(
         amount0,
         amount1,
         to,
-        deadline
+        deadline,
+        { from: signer.address }
       )
   ).wait();
 
   const pair = await factoryContract.getPair(token0, token1);
+
+  return pair;
+}
+
+async function createPairETH(
+  router,
+  factory,
+  token0,
+  amount0,
+  amount1,
+  to,
+  signer
+) {
+  const deadline = new Date().getTime();
+  const routerContract = getContract(router, JSON.stringify(UniswapV2Router));
+  const factoryContract = getContract(
+    factory,
+    JSON.stringify(UniswapV2Factory)
+  );
+  const token0Contract = getContract(token0, JSON.stringify(ERC20));
+
+  console.log("Approving router to consume tokens...");
+  await (
+    await token0Contract
+      .connect(signer)
+      .approve(router, getBigNumber(10000000000), { from: signer.address })
+  ).wait();
+  console.log("Approved.");
+
+  console.log("Addding liquidity...");
+  await (
+    await routerContract
+      .connect(signer)
+      .addLiquidityETH(token0, amount0, amount0, amount1, to, deadline, {
+        value: amount1,
+      })
+  ).wait();
+
+  const pair = await factoryContract.getPair(token0, WETH);
 
   return pair;
 }
@@ -144,4 +185,6 @@ module.exports = {
   advanceBlock,
   advanceBlockTo,
   createPair,
+  createPairETH,
+  getContract,
 };

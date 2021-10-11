@@ -63,7 +63,6 @@ contract VaultChef is Ownable, ReentrancyGuard, Operators {
 
     // Want tokens moved from user -> this -> Strat (compounding)
     function deposit(uint256 _pid, uint256 _wantAmt) external nonReentrant {
-        console.log("Deposit function");
         _deposit(_pid, _wantAmt, msg.sender);
     }
 
@@ -84,8 +83,6 @@ contract VaultChef is Ownable, ReentrancyGuard, Operators {
         PoolInfo storage pool = poolInfo[_pid];
         UserInfo storage user = userInfo[_pid][_to];
 
-        console.log("PoolInfo", pool.strat);
-
         if (_wantAmt > 0) {
             pool.want.safeTransferFrom(msg.sender, address(this), _wantAmt);
 
@@ -101,7 +98,7 @@ contract VaultChef is Ownable, ReentrancyGuard, Operators {
     }
 
     // For unique contract calls
-    function withdraw(
+    function withdrawTo(
         uint256 _pid,
         uint256 _wantAmt,
         address _to
