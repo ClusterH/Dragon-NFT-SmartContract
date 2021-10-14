@@ -10,15 +10,13 @@ import "../libraries/Authorizable.sol";
 import "./interfaces/IDragonEquipment.sol";
 import "./interfaces/IDragonEquipmentType.sol";
 
-// import "hardhat/console.sol";
-
 contract DragonPlayerCharacter is ERC721URIStorage, Authorizable, ReentrancyGuard {
     using Counters for Counters.Counter;
     Counters.Counter private _tokenIds;
     address payable private _feeAddress;
-    uint256 private _characterPrice = 5; // 5 DGNG token
+    uint256 private _characterPrice = 5; // 5 DCAU token
 
-    address public immutable DGNG_TOKEN;
+    address public immutable DCAU_TOKEN;
     uint256 public constant START_STAT_POINTS = 12;
     uint256 public constant HEALTH_MULTIPLIER = 100;
     uint256 public constant START_LEVEL = 1;
@@ -51,12 +49,12 @@ contract DragonPlayerCharacter is ERC721URIStorage, Authorizable, ReentrancyGuar
     mapping(uint256 => mapping(uint8 => uint256)) private dragonResources; // characterId => Dragon
 
     constructor(
-        address _DGNG,
+        address _DCAU,
         address payable _feeAddress_,
         address _DRAGON_EQUIPMENT
     ) ERC721("Dragon Player Character", "DPC") {
-        require(_DGNG != address(0) && _feeAddress_ != address(0) && _DRAGON_EQUIPMENT != address(0), "Dragon: ZERO_ADDRESS");
-        DGNG_TOKEN = _DGNG;
+        require(_DCAU != address(0) && _feeAddress_ != address(0) && _DRAGON_EQUIPMENT != address(0), "Dragon: ZERO_ADDRESS");
+        DCAU_TOKEN = _DCAU;
         _feeAddress = _feeAddress_;
         DRAGON_EQUIPMENT = _DRAGON_EQUIPMENT;
     }
@@ -73,7 +71,7 @@ contract DragonPlayerCharacter is ERC721URIStorage, Authorizable, ReentrancyGuar
         uint256 endurance
     ) external onlyOwner nonReentrant returns (uint256) {
         require(attack + defense + speed + endurance == START_STAT_POINTS, "Dragon: Invalid stats");
-        IERC20(DGNG_TOKEN).transferFrom(msg.sender, _feeAddress, 5 * (10**IERC20Metadata(DGNG_TOKEN).decimals()));
+        IERC20(DCAU_TOKEN).transferFrom(msg.sender, _feeAddress, 5 * (10**IERC20Metadata(DCAU_TOKEN).decimals()));
 
         uint256 startHealth = endurance * HEALTH_MULTIPLIER;
 

@@ -19,9 +19,9 @@ abstract contract BaseStrategy is Ownable, ReentrancyGuard, Pausable {
     address public earnedAddress;
 
     address public uniRouterAddress;
-    address public constant dgngAddress = 0x3a3Df212b7AA91Aa0402B9035b098891d276572B;
-    address public constant withdrawFeeAddress = 0x4879712c5D1A98C0B88Fb700daFF5c65d12Fd729;
-    address public constant feeAddress = 0x1cb757f1eB92F25A917CE9a92ED88c1aC0734334;
+    address public dcauAddress;
+    address public withdrawFeeAddress;
+    address public feeAddress;
     address public vaultChefAddress;
     address public govAddress;
 
@@ -43,7 +43,7 @@ abstract contract BaseStrategy is Ownable, ReentrancyGuard, Pausable {
     uint256 public constant slippageFactorUL = 995;
 
     address[] public earnedToWmaticPath; // for distributeFee, DNGN_WMATIC path
-    address[] public earnedToDgngPath; // for buyBack, do we need it?
+    address[] public earnedToDcauPath; // for buyBack, do we need it?
     address[] public earnedToToken0Path; //
     address[] public earnedToToken1Path;
     address[] public token0ToEarnedPath;
@@ -77,7 +77,7 @@ abstract contract BaseStrategy is Ownable, ReentrancyGuard, Pausable {
 
     function _emergencyVaultWithdraw() internal virtual;
 
-    function deposit(address _userAddress, uint256 _wantAmt) external onlyOwner nonReentrant whenNotPaused returns (uint256) {
+    function deposit(uint256 _wantAmt) external onlyOwner nonReentrant whenNotPaused returns (uint256) {
         // Call must happen before transfer
         uint256 wantLockedBefore = wantLockedTotal();
 
@@ -103,7 +103,7 @@ abstract contract BaseStrategy is Ownable, ReentrancyGuard, Pausable {
         return sharesAfter - sharesBefore;
     }
 
-    function withdraw(address _userAddress, uint256 _wantAmt) external onlyOwner nonReentrant returns (uint256) {
+    function withdraw(uint256 _wantAmt) external onlyOwner nonReentrant returns (uint256) {
         require(_wantAmt > 0, "_wantAmt is 0");
 
         uint256 wantAmt = IERC20(wantAddress).balanceOf(address(this));
@@ -153,13 +153,13 @@ abstract contract BaseStrategy is Ownable, ReentrancyGuard, Pausable {
     }
 
     function buyBack(uint256 _earnedAmt) internal virtual returns (uint256) {
-        if (earnedAddress == dgngAddress) {
+        if (earnedAddress == dcauAddress) {
             return _earnedAmt;
         }
         if (buyBackRate > 0) {
             uint256 buyBackAmt = (_earnedAmt * buyBackRate) / feeMax;
-            if (earnedAddress != dgngAddress) {
-                _safeSwap(buyBackAmt, earnedToDgngPath, buyBackAddress);
+            if (earnedAddress != dcauAddress) {
+                _safeSwap(buyBackAmt, earnedToDcauPath, buyBackAddress);
             }
             _earnedAmt = _earnedAmt - buyBackAmt;
         }

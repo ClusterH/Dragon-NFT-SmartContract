@@ -9,8 +9,6 @@ import "@openzeppelin/contracts/utils/structs/EnumerableSet.sol";
 import "./interfaces/IStrategy.sol";
 import "./Operators.sol";
 
-import "hardhat/console.sol";
-
 contract VaultChef is Ownable, ReentrancyGuard, Operators {
     using SafeERC20 for IERC20;
 
@@ -86,7 +84,7 @@ contract VaultChef is Ownable, ReentrancyGuard, Operators {
         if (_wantAmt > 0) {
             pool.want.safeTransferFrom(msg.sender, address(this), _wantAmt);
 
-            uint256 sharesAdded = IStrategy(poolInfo[_pid].strat).deposit(_to, _wantAmt);
+            uint256 sharesAdded = IStrategy(poolInfo[_pid].strat).deposit(_wantAmt);
             user.shares = user.shares + sharesAdded;
         }
         emit Deposit(_to, _pid, _wantAmt);
@@ -126,7 +124,7 @@ contract VaultChef is Ownable, ReentrancyGuard, Operators {
             _wantAmt = amount;
         }
         if (_wantAmt > 0) {
-            uint256 sharesRemoved = IStrategy(poolInfo[_pid].strat).withdraw(msg.sender, _wantAmt);
+            uint256 sharesRemoved = IStrategy(poolInfo[_pid].strat).withdraw(_wantAmt);
 
             if (sharesRemoved > user.shares) {
                 user.shares = 0;

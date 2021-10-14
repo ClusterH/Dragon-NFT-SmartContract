@@ -16,6 +16,7 @@ contract StrategyMasterChef is BaseStrategy {
     uint256 public pid; // MasterChef Pool id
 
     constructor(
+        address[] memory _initialWalletPath,
         address _vaultChefAddress,
         address _masterchefAddress,
         address _uniRouterAddress,
@@ -24,7 +25,11 @@ contract StrategyMasterChef is BaseStrategy {
         address _earnedAddress,
         address[] memory _earnedToWmaticPath
     ) {
+        require(_initialWalletPath.length == 3, "Parameter _initialWalletPath length shoud be 3");
         govAddress = msg.sender;
+        dcauAddress = _initialWalletPath[0];
+        withdrawFeeAddress = _initialWalletPath[1];
+        feeAddress = _initialWalletPath[2];
         vaultChefAddress = _vaultChefAddress;
         masterchefAddress = _masterchefAddress;
         uniRouterAddress = _uniRouterAddress;

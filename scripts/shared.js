@@ -176,6 +176,17 @@ async function advanceBlockTo(blockNumber) {
   }
 }
 
+async function advanceTimeStamp(advancedHrs) {
+  const currentDate = new Date();
+  const afterHours = new Date(
+    currentDate.setDate(currentDate.getHours() + advancedHrs) //After some hours
+  );
+  const afterHoursTimeStampUTC =
+    new Date(afterHours.toUTCString()).getTime() / 1000;
+  network.provider.send("evm_setNextBlockTimestamp", [afterHoursTimeStampUTC]);
+  await network.provider.send("evm_mine");
+}
+
 module.exports = {
   DGNG_TOTAL_SUPPLY,
   DGNG_PRE_MINT,
@@ -184,6 +195,7 @@ module.exports = {
   getBigNumber,
   advanceBlock,
   advanceBlockTo,
+  advanceTimeStamp,
   createPair,
   createPairETH,
   getContract,
